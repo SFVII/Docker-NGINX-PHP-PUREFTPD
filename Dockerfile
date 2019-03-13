@@ -19,7 +19,6 @@ ENV FTP_NGINX_ACCESS_LOG /var/www/log/access
 ENV MEMCACHED_PORT 11211
 ENV ENTRYPOINT /docker-entrypoint.sh
 
-RUN add-apt-repository ppa:ondrej/php
 RUN apt-get -y update
 RUN apt-get -y --force-yes install dpkg-dev debhelper
 
@@ -34,7 +33,13 @@ RUN /tmp/pureftpd.sh
 
 # On Ajoute des templates
 ADD browny-v1.0.zip /tmp/browny-v1.0.zip
-RUN unzip /tmp/browny-v1.0.zip
+RUN mkdir /var/www/web
+RUN chmod 777 /var/www/web
+RUN unzip /tmp/browny-v1.0.zip -d /tmp/.
+RUN mv /tmp/browny-v1.0/* /var/www/web/.
+
+# On clean le tout
+RUN rm -R /tmp/*
 
 #Erase default config
 ADD site.conf /etc/nginx/sites-available/default
@@ -42,5 +47,7 @@ RUN mkdir /var/www/log/
 RUN ln -s /var/log/nginx/error.log /var/www/log/.
 RUN ln -s /var/log/nginx/access.log /var/www/log/.
 
-COPY ./docker-entrypoint.sh /
-ENTRYPOINT ["/docker-entrypoint.sh"]
+ADD start_services.sh /start_services.sh
+RUN chmod +x /start_services.sh
+ENTRYPOINT ["/start_services.sh"]
+CMD ["/sbin/my_init"]
