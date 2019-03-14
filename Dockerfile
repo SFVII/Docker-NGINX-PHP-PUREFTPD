@@ -50,4 +50,4 @@ RUN ln -s /var/log/nginx/access.log /var/www/log/.
 ADD start_services.sh /start_services.sh
 RUN chmod +x /start_services.sh
 ENTRYPOINT ["/start_services.sh"]
-CMD ["/sbin/my_init"]
+CMD ["/sbin/my_init && echo 'Container is ready' && /bin/sh "]
